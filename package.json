@@ -1,11 +1,72 @@
 {
   "name": "jotai-ssr",
+  "description": "",
   "version": "0.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "type": "module",
+  "author": "Poimandres",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jotaijs/jotai-ssr.git"
   },
-  "author": "",
+  "source": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      },
+      "default": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "packageManager": "pnpm@9.2.0",
+  "scripts": {
+    "compile": "rm -rf dist && pnpm run '/^compile:.*/'",
+    "compile:esm": "tsc -p tsconfig.esm.json",
+    "compile:cjs": "tsc -p tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
+    "test": "pnpm run '/^test:.*/'",
+    "test:lint": "eslint .",
+    "test:types": "tsc -p . --noEmit"
+  },
+  "keywords": [
+    "jotai",
+    "react",
+    "ssr",
+    "server",
+    "hydrate"
+  ],
   "license": "MIT",
-  "description": ""
+  "peerDependencies": {
+    "jotai": ">=2.0.0",
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.1.1",
+    "@types/eslint-plugin-jsx-a11y": "^6.9.0",
+    "@types/eslint__js": "^8.42.3",
+    "@types/node": "^22.2.0",
+    "@types/react": "^18.3.3",
+    "eslint": "^9.9.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "jotai": "^2.9.2",
+    "prettier": "^3.3.3",
+    "react": "^18.3.1",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.0.1"
+  }
 }
