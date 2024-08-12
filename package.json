@@ -1,9 +1,9 @@
 {
   "name": "jotai-ssr",
-  "description": "",
+  "description": "Jotai utilities for server-side rendering (SSR)",
   "version": "0.0.0",
   "type": "module",
-  "author": "Poimandres",
+  "author": "Daisuke Akazawa",
   "repository": {
     "type": "git",
     "url": "https://github.com/jotaijs/jotai-ssr.git"
