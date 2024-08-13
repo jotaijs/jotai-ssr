@@ -77,9 +77,9 @@ If you need to share stores between `layout.tsx` and `page.tsx`, you can use the
 #### Why do we need `RenderingBoundary`?
 In Next.js, when navigating pages using the `Link` component, `layout.jsx` is not re-rendered, but `page.jsx` is. Because of this structure, if `page.jsx` references a Store that is in `layout.jsx` or is global, there's a possibility of errors occurring during page transitions due to mismatches between server-side rendered HTML and hydration.
 Think following case:
-1. Create const sampleAtom = atom(0)
+1. Create `const sampleAtom = atom(0)`
 2. Set up a Provider in `layout.jsx`, or render without setting up a Provider anywhere
-3. Change sampleAtom to 1 in page.jsx
+3. Change sampleAtom to 1 in `page.jsx`
 4. Navigate to another page using `Link` component
 
 In this case, the value of sampleAtom on server-side rendered HTML will be 0, but the value of sampleAtom on the client side will be 1. This will cause a mismatch between server-side rendered HTML and hydration, resulting in an error. To prevent this, use `RenderingBoundary` to create a new store for each page.
@@ -126,6 +126,15 @@ async function Component() {
   )
 }
 ```
+> Note: if you use `HydrationBoundary` in React Server Components, the file that defines a hydrated atom must include the `'use client'` directive, like this:
+> ```jsx
+> 'use client'
+> 
+> import { atom } from 'jotai';
+> 
+> export const someAtom = atom(0);
+> ```
+> Detailed explanation is [here](https://github.com/pmndrs/jotai/discussions/2692#discussioncomment-10316130).
 
 With React Client Components:
 ```jsx
@@ -148,22 +157,22 @@ You should use hydrated atoms within the `HydrationBoundary` component. If you u
 You can use multiple `HydrationBoundary` components.
 ```jsx
 import { HydrationBoundary } from 'jotai-ssr'
-import { dataA, dataB } from './atoms'
+import { dataAAtom, dataBAtom } from './atoms'
 
-async function HydrationDataABoundary() {
+async function HydrationDataABoundary({ children }) {
   const dataA = await fetch('https://api.example.com/dataA').then((res) => res.json())
   return (
-    <HydrationBoundary hydrateAtoms={[[dataA, dataA]]}>
-      <ChildComponent />
+    <HydrationBoundary hydrateAtoms={[[dataAAtom, dataA]]}>
+      {children}
     </HydrationBoundary>
   )
 }
 
-async function HydrationDataBBoundary() {
+async function HydrationDataBBoundary({ children }) {
   const dataB = await fetch('https://api.example.com/dataB').then((res) => res.json())
   return (
-    <HydrationBoundary hydrateAtoms={[[dataB, dataB]]}>
-      <ChildComponent />
+    <HydrationBoundary hydrateAtoms={[[dataBAtom, dataB]]}>
+      {children}
     </HydrationBoundary>
   )
 }
