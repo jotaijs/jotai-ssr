@@ -126,6 +126,14 @@ async function Component() {
   )
 }
 ```
+> Note: if you use `HydrationBoundary` in React Server Components, the file that defines a hydrated atom must include the `'use client'` directive, like this:
+> ```jsx
+> 'use client'
+> 
+> import { atom } from 'jotai';
+> 
+> export const someAtom = atom(0);
+> ```
 
 With React Client Components:
 ```jsx
