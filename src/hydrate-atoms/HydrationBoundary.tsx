@@ -1,7 +1,11 @@
 'use client';
 
 import type { PropsWithChildren } from 'react';
-import type { AnyWritableAtom, InferAtomTuples } from './types.js';
+import type {
+  AnyWritableAtom,
+  HydrateAtomOptions,
+  InferAtomTuples,
+} from './types.js';
 import { useHydrateAtoms } from './use-hydrate-atoms.js';
 
 export function HydrationBoundary<
@@ -9,8 +13,12 @@ export function HydrationBoundary<
 >({
   children,
   hydrateAtoms,
-}: PropsWithChildren<{ hydrateAtoms: InferAtomTuples<T> }>) {
-  useHydrateAtoms(hydrateAtoms);
+  options,
+}: PropsWithChildren<{
+  hydrateAtoms: InferAtomTuples<T>;
+  options?: HydrateAtomOptions | undefined;
+}>) {
+  useHydrateAtoms(hydrateAtoms, options);
 
   return <>{children}</>;
 }

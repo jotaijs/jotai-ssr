@@ -1,10 +1,9 @@
 'use client';
 
-import { Provider, type createStore } from 'jotai';
+import { Provider } from 'jotai';
 import type { PropsWithChildren } from 'react';
 import { useCreateStore } from './use-create-store.js';
-
-type Store = ReturnType<typeof createStore>;
+import type { Store } from '../shared.js';
 
 function SSRProviderWithGivenStore({
   store,

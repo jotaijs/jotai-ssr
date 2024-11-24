@@ -1,13 +1,19 @@
 import { atom, useStore } from 'jotai';
-import type { AnyWritableAtom, InferAtomTuples } from './types.js';
+import type {
+  AnyWritableAtom,
+  HydrateAtomOptions,
+  InferAtomTuples,
+} from './types.js';
 import { useCallback, useEffect, useRef } from 'react';
 
 export function useHydrateAtoms<
   T extends (readonly [AnyWritableAtom, ...unknown[]])[],
->(hydrateAtoms: InferAtomTuples<T>) {
+>(hydrateAtoms: InferAtomTuples<T>, options?: HydrateAtomOptions) {
   const isHydratedRef = useRef(false);
-  const lastHydrateAtoms = useRef(hydrateAtoms);
-  const store = useStore();
+  const lastRehydrateKey = useRef(options?.rehydrateKey);
+  const store = useStore(
+    options?.store != null ? { store: options?.store } : undefined,
+  );
 
   const hydrate = useCallback(() => {
     store.set(isHydratingPrimitiveAtom, true);
@@ -23,11 +29,11 @@ export function useHydrateAtoms<
   }
 
   useEffect(() => {
-    if (lastHydrateAtoms.current !== hydrateAtoms) {
-      lastHydrateAtoms.current = hydrateAtoms;
+    if (lastRehydrateKey.current !== options?.rehydrateKey) {
+      lastRehydrateKey.current = options?.rehydrateKey;
       hydrate();
     }
-  }, [hydrate, hydrateAtoms]);
+  }, [hydrate, options?.rehydrateKey]);
 }
 
 const isHydratingPrimitiveAtom = atom(false);

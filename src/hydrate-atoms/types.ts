@@ -1,4 +1,5 @@
 import type { WritableAtom } from 'jotai';
+import type { Store } from '../shared.js';
 
 export type AnyWritableAtom = WritableAtom<unknown, never[], unknown>;
 
@@ -8,4 +9,9 @@ export type InferAtomTuples<T> = {
       ? readonly [A, ...Args]
       : T[K]
     : never;
+};
+
+export type HydrateAtomOptions = {
+  store: Store;
+  rehydrateKey?: string | undefined;
 };
