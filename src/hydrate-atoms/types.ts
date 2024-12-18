@@ -12,6 +12,6 @@ export type InferAtomTuples<T> = {
 };
 
 export type HydrateAtomOptions = {
-  store: Store;
+  store?: Store | undefined;
   enableReHydrate?: boolean | undefined;
 };
