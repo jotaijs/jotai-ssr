@@ -10,7 +10,7 @@ export function useHydrateAtoms<
   T extends (readonly [AnyWritableAtom, ...unknown[]])[],
 >(hydrateAtoms: InferAtomTuples<T>, options?: HydrateAtomOptions) {
   const isHydratedRef = useRef(false);
-  const lastRehydrateKey = useRef(options?.rehydrateKey);
+  const lastHydrateAtoms = useRef(hydrateAtoms);
   const store = useStore(
     options?.store != null ? { store: options?.store } : undefined,
   );
@@ -29,11 +29,14 @@ export function useHydrateAtoms<
   }
 
   useEffect(() => {
-    if (lastRehydrateKey.current !== options?.rehydrateKey) {
-      lastRehydrateKey.current = options?.rehydrateKey;
+    if (!options?.enableReHydrate) {
+      return;
+    }
+    if (hydrateAtoms !== lastHydrateAtoms.current) {
+      lastHydrateAtoms.current = hydrateAtoms;
       hydrate();
     }
-  }, [hydrate, options?.rehydrateKey]);
+  }, [hydrate, options?.enableReHydrate, hydrateAtoms]);
 }
 
 const isHydratingPrimitiveAtom = atom(false);
