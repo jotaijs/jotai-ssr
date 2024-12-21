@@ -20,9 +20,10 @@ This library extends or wraps the existing Jotai SSR utilities to provide a more
    1. [What is Hydration?](#what-is-hydration)  
    2. [How to Hydrate an Atom](#how-to-hydrate-an-atom)  
    3. [`HydrationBoundary`](#hydrationboundary)  
-   4. [Important Notes on Hydration Logic](#important-notes-on-hydration-logic)  
-4. [Soft Navigation in SSR Frameworks](#soft-navigation-in-ssr-frameworks)  
-5. [Re-Hydration](#re-hydration)  
+4. [Streaming Hydration with Async Atoms](#streaming-hydration-with-async-atoms)
+5. [Important Notes on Hydration Logic](#important-notes-on-hydration-logic)  
+6. [Soft Navigation in SSR Frameworks](#soft-navigation-in-ssr-frameworks)  
+7. [Re-Hydration](#re-hydration)  
 
 ---
 
@@ -187,6 +188,68 @@ const ServerComponent = async () => {
 You can pass an optional `options` prop, such as `{ store: myStore }`, if you want to hydrate into a specific store.
 
 > **Note**: `HydrationBoundary` can be used in both Client and Server Components. However, when using it in a Server Component, the atom definitions must be marked with `'use client'`. Also, any value you pass for hydration **must be serializable**. This is because `HydrationBoundary` itself is a React Client Component.
+
+---
+
+## Streaming Hydration with Async Atoms
+
+Some SSR frameworks (like Next.js) support **streaming responses** so that part of your UI can render before all data is loaded. With Jotai, you can stream data from the server into **async atoms**. This allows your components to start rendering in a suspended state, then reveal when the data arrives. Here’s how you can do it with **jotai-ssr**:
+
+### Defining an Async Atom
+
+First, define an atom that holds a promise:
+
+```tsx
+'use client';
+
+import { atom, useAtomValue } from 'jotai';
+
+// Define an async atom that resolves to a number.
+export const countAtom = atom<Promise<number>>();
+
+export const CountComponent = () => {
+  // Jotai will automatically suspend here until the promise resolves
+  const count = useAtomValue(countAtom);
+  return <div>{count}</div>;
+};
+```
+
+> **Note**: Because this is an async atom, **any** component reading it will suspend by default, so you must wrap it with `<Suspense>`.
+
+### Streaming Hydration in the Server/Edge Environment
+
+Next, in your server-side or edge code, you can fetch the data and hydrate the async atom with a **promise**:
+
+```tsx
+import { HydrationBoundary } from 'jotai-ssr';
+import { Suspense } from 'react';
+import { countAtom, CountComponent } from './client';
+
+export const StreamingHydration = () => {
+  // Suppose this fetchCount function returns a Promise<number>
+  const countPromise = fetchCount();
+
+  return (
+    <HydrationBoundary hydrateAtoms={[[countAtom, countPromise]]}>
+      <Suspense fallback={<div>loading...</div>}>
+        <CountComponent />
+      </Suspense>
+    </HydrationBoundary>
+  );
+};
+```
+
+1. **Fetch or stream data** (e.g., `fetchCount()`) on the server.  
+2. **Hydrate** the async atom by passing `[countAtom, countPromise]` to `HydrationBoundary`.  
+3. **Wrap** your async-consuming components (`<CountComponent />`) with a `<Suspense>` boundary to handle the loading state.
+
+This setup ensures that:
+
+- The async atom suspends until the promise resolves.  
+- The hydrated value is set **immediately** in the store, allowing the client to continue with the same promise.  
+- React’s Suspense boundary displays a fallback (`loading...`) until the atom’s promise settles.
+
+This pattern allows you to combine the power of **async atoms** with server-side streaming, letting Jotai manage data states in a way that feels natural within React’s **Suspense** model.
 
 ---
 
