@@ -28,7 +28,7 @@
   "files": [
     "dist"
   ],
-  "packageManager": "pnpm@9.2.0",
+  "packageManager": "pnpm@9.15.2",
   "scripts": {
     "compile": "rm -rf dist && pnpm run '/^compile:.*/'",
     "compile:esm": "tsc -p tsconfig.esm.json",
@@ -50,23 +50,23 @@
     "react": ">=18.0.0"
   },
   "devDependencies": {
-    "@eslint/compat": "^1.1.1",
-    "@types/eslint-plugin-jsx-a11y": "^6.9.0",
+    "@eslint/compat": "^1.2.4",
+    "@types/eslint-plugin-jsx-a11y": "^6.10.0",
     "@types/eslint__js": "^8.42.3",
-    "@types/node": "^22.2.0",
-    "@types/react": "^18.3.3",
-    "eslint": "^9.9.0",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.2",
+    "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-import-resolver-typescript": "^3.6.1",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint-import-resolver-typescript": "^3.7.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-react": "^7.35.0",
-    "eslint-plugin-react-hooks": "^4.6.2",
-    "jotai": "^2.9.2",
-    "prettier": "^3.3.3",
-    "react": "^18.3.1",
-    "typescript": "^5.5.4",
-    "typescript-eslint": "^8.0.1"
+    "eslint-plugin-react": "^7.37.3",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "jotai": "^2.11.0",
+    "prettier": "^3.4.2",
+    "react": "^19.0.0",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.19.0"
   }
 }
