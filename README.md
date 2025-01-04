@@ -2,7 +2,6 @@
 
 **jotai-ssr** is a utility library for [Jotai](https://jotai.org/) to facilitate server-side rendering (SSR). It provides helpers for:
 
-- Creating an **isolated store per request** (to avoid data leak between users).
 - **Hydrating** atom values from server to client (and optionally re-hydrating).
 - Handling SSR scenarios, including **React Server Components** and soft navigations in frameworks like Next.js, Remix, and Waku.
 
@@ -13,9 +12,7 @@ This library extends or wraps the existing Jotai SSR utilities to provide a more
 ## Table of Contents
 
 1. [Installation](#installation)  
-2. [Creating a Safe Store for Each Request](#creating-a-safe-store-for-each-request)  
-   1. [`useCreateStore`](#usecreatestore)  
-   2. [`SSRProvider`](#ssrprovider)  
+2. [Creating a Safe Store for Each Request](#creating-a-safe-store-for-each-request)
 3. [Hydration](#hydration)  
    1. [What is Hydration?](#what-is-hydration)  
    2. [How to Hydrate an Atom](#how-to-hydrate-an-atom)  
@@ -43,64 +40,52 @@ pnpm add jotai-ssr
 
 When using Jotai in an SSR environment, **you must ensure each request has its own store**. Relying on a shared, global store (e.g. `defaultStore`) across requests can lead to data leakage between different users.
 
-### Using the `useCreateStore` Hook
-
-If you create a store manually, you typically do it like this in a Client Component:
+To create an isolated store per request, you should use `Provider` for each layout or page that uses Jotai like so:
 
 ```tsx
-'use client';
-import { createStore, Provider } from 'jotai';
-import { useState } from 'react';
-
-const Page = () => {
-  // Ensure a new store is created per request
-  const [store] = useState(() => createStore());
-  return <Provider store={store}>{/* your content */}</Provider>;
-};
-```
-
-**jotai-ssr** offers a convenient `useCreateStore` hook to simplify this pattern:
-
-```tsx
-'use client';
 import { Provider } from 'jotai';
-import { useCreateStore } from 'jotai-ssr';
 
 const Page = () => {
-  const store = useCreateStore();
-  return <Provider store={store}>{/* your content */}</Provider>;
-};
-```
-
-> **Note:** `useCreateStore` internally uses `useState`, so the component that calls `useCreateStore` must be a React Client Component (i.e., have the `'use client'` directive if you're in an RSC setup).
-
-### Using the `SSRProvider`
-
-Alternatively, you can use the higher-level `SSRProvider` component from **jotai-ssr**. It can be used in either a React Client Component or a React Server Component:
-
-```tsx
-import { SSRProvider } from 'jotai-ssr';
-
-const Page = () => {
-  return <SSRProvider>{/* your content */}</SSRProvider>;
-};
-```
-
-Internally, `SSRProvider` will create an isolated store for each request. You can also supply your own store:
-
-```tsx
-'use client';
-import { SSRProvider, useCreateStore } from 'jotai-ssr';
-
-const Page = () => {
-  const store = useCreateStore();
   return (
-    <SSRProvider store={store}>
-      {/* your content */}
-    </SSRProvider>
+    <Provider>{/* Your content */}</Provider>
   );
 };
 ```
+
+If you need to pass a custom store to the `Provider`, you can do so in one of the following ways:
+
+1. **Using useState**
+
+   ```tsx
+   'use client';
+
+   import { createStore, Provider } from 'jotai';
+   import { useState } from 'react';
+
+   const Page = () => {
+     const [store] = useState(() => createStore());
+     return <Provider store={store}>{/* your content */}</Provider>;
+   };
+   ```
+
+2. **Using useRef**
+
+   ```tsx
+   'use client';
+
+   import { createStore, Provider } from 'jotai';
+   import { useRef } from 'react';
+
+   const Page = () => {
+     const storeRef = useRef(undefined);
+     if (!storeRef.current) {
+       storeRef.current = createStore();
+     }
+     return <Provider store={storeRef.current}>{/* your content */}</Provider>;
+   };
+   ```
+
+Both approaches ensure a new store instance is created for each request, preventing data from leaking between different users.
 
 ---
 

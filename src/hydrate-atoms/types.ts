@@ -1,5 +1,6 @@
-import type { WritableAtom } from 'jotai';
-import type { Store } from '../shared.js';
+import type { createStore, WritableAtom } from 'jotai';
+
+export type Store = ReturnType<typeof createStore>;
 
 export type AnyWritableAtom = WritableAtom<unknown, never[], unknown>;
 
